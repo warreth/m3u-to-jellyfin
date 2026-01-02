@@ -58,7 +58,11 @@ def fetch_library_index():
 
     try:
         r = session.get(f"{JELLYFIN_URL}/Items", params=params)
-        items = r.json().get("Items", [])
+        resp = r.json()
+        if "errors" in resp:
+            print(f"❌ API Error: {resp.get("errors")}")
+            sys.exit(1)
+        items = resp.get("Items", [])
     except Exception as e:
         print(f"❌ API Error: {e}")
         sys.exit(1)
