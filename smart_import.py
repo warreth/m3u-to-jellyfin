@@ -187,8 +187,13 @@ def process_m3us(index_map):
                 missing.append(f"{fname} [{reason}]")
 
         if to_add:
-            session.post(f"{JELLYFIN_URL}/Playlists/{pid}/Items",
-                         params={"Ids": ",".join(to_add), "UserId": USER_ID})
+            # Send items to be added 50 at a time to avoid requests that are too large
+            segments = [to_add[i:i+50] for i in range(0, len(to_add), 50)]
+            for segment in segments:
+                r = session.post(f"{JELLYFIN_URL}/Playlists/{pid}/Items",
+                             params={"Ids": ",".join(segment), "UserId": USER_ID})
+                if r.status_code != 204:
+                    print(f"❌ API Error: {r.status_code} {r.text}")
 
         if missing:
             print(f"\n📂 Playlist: {playlist_name}")
