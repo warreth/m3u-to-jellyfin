@@ -25,10 +25,14 @@ def clean_text(text):
     2. Removes brackets [] and parentheses () content
     3. Removes junk words
     4. Removes leading 'the'
-    5. Returns only alphanumeric characters
+    5. Removes leading track number
+    6. Returns only alphanumeric characters
     """
     if not text: return ""
     text = urllib.parse.unquote(text).lower()
+
+    # Remove leading track number
+    text = re.sub(r'^[0-9\-\.]*', "", text)
 
     # Remove youtube brackets [id]
     text = re.sub(r'\[.*?\]', '', text)
