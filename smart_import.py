@@ -6,6 +6,7 @@ import urllib.parse
 import sys
 import time
 import difflib
+import json
 
 # ================= CONFIGURATION =================
 JELLYFIN_URL = "http://localhost:8096"
@@ -142,7 +143,12 @@ def get_or_create_playlist(name):
     except: pass
 
     r = session.post(f"{JELLYFIN_URL}/Playlists", params={"Name": name, "UserId": USER_ID})
-    return r.json()["Id"], False
+    try:
+        return r.json()["Id"], False
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        print("\nServer response:\n\n", json.dumps(r.json(), indent=4))
+        sys.exit(1)
 
 def get_playlist_items(pid):
     try:
