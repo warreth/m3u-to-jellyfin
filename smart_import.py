@@ -6,6 +6,8 @@ import urllib.parse
 import sys
 import time
 import difflib
+import json
+from pathlib import Path
 
 # ================= CONFIGURATION =================
 JELLYFIN_URL = "http://localhost:8096"
@@ -13,6 +15,7 @@ API_KEY = ""
 USER_ID = ""
 M3U_FOLDER = ""
 FUZZY_THRESHOLD = 0.85 # 85% similarity required
+CACHE_PATH = Path("cache.json")
 # =================================================
 
 session = requests.Session()
@@ -200,6 +203,12 @@ def process_m3us(index_map):
                 print(f"❌ MISSING: {m}")
 
 if __name__ == "__main__":
-    idx = fetch_library_index()
+    if CACHE_PATH.exists():
+        with open(CACHE_PATH) as f:
+            idx = json.load(f)
+    else:
+        idx = fetch_library_index()
+        with open(CACHE_PATH, 'w') as f:
+            json.dump(idx, f)
     process_m3us(idx)
     print("\n🏁 Done.")
